@@ -103,6 +103,23 @@ const Mutation = new GraphQLObjectType({
         })
         return stuffyFall.save();
       }
+    },
+    updateStuffyFall: {
+      type: SubmissionType,
+      args: {
+        date: {type: new GraphQLNonNull(GraphQLString) },
+        stuffyName: { type: new GraphQLNonNull(GraphQLString) },
+        didFall: { type: new GraphQLNonNull(GraphQLBoolean) }
+      },
+      resolve(parent, args) {
+        return Submission.findOneAndUpdate(
+          {
+            date: args.date,
+            stuffyName: args.stuffyName
+          },
+          {didFall: args.didFall}
+        );
+      }
     }
   }
 });

@@ -1,5 +1,6 @@
 const graphql = require('graphql');
 const Stuffy = require('../models/stuffy');
+const Submission = require('../models/submission');
 const { GraphQLObjectType, GraphQLBoolean, GraphQLString, GraphQLInt, GraphQLID, GraphQLSchema, GraphQLList, GraphQLNonNull } = graphql;
 
 const StuffyType = new GraphQLObjectType({
@@ -12,6 +13,16 @@ const StuffyType = new GraphQLObjectType({
   })
 });
 
+const SubmissionType = new GraphQLObjectType({
+  name: 'Submission',
+  fields: () => ({
+    id: { type: GraphQLID },
+    date: { type: GraphQLString},
+    stuffyName: { type: GraphQLString },
+    didFall: { type: GraphQLBoolean }
+  })
+});
+
 const Query = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {      
@@ -21,6 +32,15 @@ const Query = new GraphQLObjectType({
           return Stuffy.find({});
       }
     },
+    priorSubmissions: {
+      type: new GraphQLList(SubmissionType),
+      args:{
+        date: { type: GraphQLString},
+      },
+      resolve(parent, args) {
+        return Submission.find({ date: args.date })
+      }
+    }
   }
 });
 
@@ -66,6 +86,39 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         return Stuffy.findByIdAndDelete(args.id);
+      }
+    },
+    logStuffyFall: {
+      type: SubmissionType,
+      args: {
+        date: {type: new GraphQLNonNull(GraphQLString) },
+        stuffyName: { type: new GraphQLNonNull(GraphQLString) },
+        didFall: { type: new GraphQLNonNull(GraphQLBoolean) }
+      },
+      resolve(parent, args) {
+        let stuffyFall = new Submission({
+          date: args.date,
+          stuffyName: args.stuffyName,
+          didFall: args.didFall
+        })
+        return stuffyFall.save();
+      }
+    },
+    updateStuffyFall: {
+      type: SubmissionType,
+      args: {
+        date: {type: new GraphQLNonNull(GraphQLString) },
+        stuffyName: { type: new GraphQLNonNull(GraphQLString) },
+        didFall: { type: new GraphQLNonNull(GraphQLBoolean) }
+      },
+      resolve(parent, args) {
+        return Submission.findOneAndUpdate(
+          {
+            date: args.date,
+            stuffyName: args.stuffyName
+          },
+          {didFall: args.didFall}
+        );
       }
     }
   }

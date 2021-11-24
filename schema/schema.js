@@ -32,13 +32,19 @@ const Query = new GraphQLObjectType({
           return Stuffy.find({});
       }
     },
-    priorSubmissions: {
+    getPriorSubmissionsByDate: {
       type: new GraphQLList(SubmissionType),
       args:{
         date: { type: GraphQLString},
       },
       resolve(parent, args) {
         return Submission.find({ date: args.date })
+      }
+    },
+    getAllSubmissions: {
+      type: new GraphQLList(SubmissionType),
+      resolve(parent, args) {
+        return Submission.find({})
       }
     }
   }

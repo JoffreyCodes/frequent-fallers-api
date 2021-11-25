@@ -32,7 +32,7 @@ const Query = new GraphQLObjectType({
           return Stuffy.find({});
       }
     },
-    getPriorSubmissionsByDate: {
+    priorSubmissions: {
       type: new GraphQLList(SubmissionType),
       args:{
         date: { type: GraphQLString},
